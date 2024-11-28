@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaRegEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import {  MdDelete } from "react-icons/md";
 import { GrUpdate } from "react-icons/gr";
 import { TiArrowBack } from "react-icons/ti";
 
@@ -10,6 +10,7 @@ const App = () => {
  const [updateData ,setUpdateData] = useState(" ")
   const [tasks, setTasks] = useState(" ");
   const [allTask, setAllTask] = useState([]);
+    const [id, setId] = useState("");
   const handleSubmit = async () => {
     // info:FetchApi Add new task to the database
     // const response = await fetch("http://localhost:3000/user", {
@@ -35,8 +36,10 @@ const App = () => {
       .post("http://localhost:3000/user", {
         name: tasks,
       })
+      
       .then((data) => {
         console.log(data);
+        setTasks()
       })
       .catch((err) => {
         console.log(err);
@@ -89,18 +92,24 @@ const App = () => {
       });
   };
   const handleEdit = (id) => {
-  setEdit(true)
-  }
+    setId(id)
+    setEdit(true);
+  };
+  const handleUpdateTodo = (e) => {
+  setUpdateData(e.target.value)
+}
   
-  const handleUpdate = (id) => { 
-    axios.patch(`http://localhost:3000/update/user/${id}`).then((data) => {
-      console.log(data)
-      alert("Updated Todo")
+  const handleUpdate =  async() => {
+    try {
+      await axios.patch(`http://localhost:3000/update/user/${id}`, {
+        name: updateData,
+      });
       setEdit(false)
-    }).catch((err) => {
-      console.log(err)
-    })
-  }
+      getAllTasks()
+    } catch (error) {
+      console.log(error)
+    }
+  };
   return (
     <div>
       <div className="relative max-w-md mx-auto mt-16 overflow-hidden bg-white rounded-lg shadow-lg">
@@ -148,6 +157,7 @@ const App = () => {
                   />
                 </div>
               </div>
+              <hr  className="w-[400px] mt-2 bg-red-500"/>
             </li>
           </ul>
         ))}
@@ -159,11 +169,10 @@ const App = () => {
               </h1>
               <div className="flex gap-4 mt-2 ml-10">
                 <input
-                  onChange={(e) => {
-                    setUpdateData(e.target.value);
-                  }}
+                  onChange={handleUpdateTodo}
                   type="text"
                   placeholder="Update your data..."
+                  value={allTask.name}
                   className="px-3 border border-b outline-none"
                 />
                 <div className="flex gap-4">
